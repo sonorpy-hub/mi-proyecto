@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FarmaCompar Paraguay</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d1117;
+  --surface: #161b22;
+  --surface2: #1c2128;
+  --border: #30363d;
+  --accent: #00e5a0;
+  --accent2: #00b8ff;
+  --accent3: #ff6b6b;
+  --text: #e6edf3;
+  --muted: #7d8590;
+  --c1: #00e5a0;
+  --c2: #00b8ff;
+  --c3: #ffd166;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background:var(--bg);
+  color:var(--text);
+  font-family:'DM Sans',sans-serif;
+  min-height:100vh;
+}
+body::before {
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image:
+    linear-gradient(rgba(0,229,160,.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,229,160,.03) 1px,transparent 1px);
+  background-size:40px 40px;
+  pointer-events:none;
+  z-index:0;
+}
+.wrap { max-width:960px; margin:0 auto; padding:0 20px; position:relative; z-index:1; }
+
+/* HEADER */
+header { padding:48px 0 28px; text-align:center; animation:fdw .6s ease both; }
+.badge {
+  display:inline-flex; align-items:center; gap:8px;
+  background:rgba(0,229,160,.08); border:1px solid rgba(0,229,160,.2);
+  border-radius:100px; padding:5px 16px; font-size:11px;
+  color:var(--accent); letter-spacing:2px; text-transform:uppercase;
+  margin-bottom:18px; font-weight:500;
+}
+h1 {
+  font-family:'Syne',sans-serif; font-size:clamp(2rem,5vw,3.2rem);
+  font-weight:800; line-height:1.1; margin-bottom:10px;
+  background:linear-gradient(135deg,#fff 40%,var(--accent));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+}
+.sub { color:var(--muted); font-size:.95rem; margin-bottom:18px; }
+.tags { display:flex; justify-content:center; gap:8px; flex-wrap:wrap; }
+.tag {
+  font-size:11px; padding:4px 12px; border-radius:100px;
+  font-weight:500; border:1px solid;
+}
+.t1{color:var(--c1);border-color:rgba(0,229,160,.3);background:rgba(0,229,160,.06);}
+.t2{color:var(--c2);border-color:rgba(0,184,255,.3);background:rgba(0,184,255,.06);}
+.t3{color:var(--c3);border-color:rgba(255,209,102,.3);background:rgba(255,209,102,.06);}
+
+/* SEARCH */
+.search-sec { margin:36px 0 44px; animation:fup .6s .1s ease both; }
+.search-box {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:16px; padding:22px;
+  transition:border-color .3s;
+}
+.search-box:focus-within {
+  border-color:rgba(0,229,160,.4);
+  box-shadow:0 0 0 4px rgba(0,229,160,.06);
+}
+.slabel {
+  font-family:'Syne',sans-serif; font-size:12px; font-weight:700;
+  letter-spacing:1px; text-transform:uppercase;
+  color:var(--accent); margin-bottom:10px; display:block;
+}
+.srow { display:flex; gap:10px; }
+input[type=text] {
+  flex:1; background:var(--surface2); border:1px solid var(--border);
+  border-radius:10px; padding:13px 16px; color:var(--text);
+  font-family:'DM Sans',sans-serif; font-size:15px; outline:none;
+  transition:border-color .2s, box-shadow .2s;
+}
+input[type=text]:focus { border-color:rgba(0,229,160,.5); box-shadow:0 0 0 3px rgba(0,229,160,.08); }
+input::placeholder { color:var(--muted); }
+.btn {
+  background:var(--accent); color:#0d1117;
+  border:none; border-radius:10px; padding:13px 26px;
+  font-family:'Syne',sans-serif; font-weight:700; font-size:14px;
+  cursor:pointer; transition:transform .15s, box-shadow .2s, opacity .2s;
+  white-space:nowrap;
+}
+.btn:hover:not(:disabled) { transform:translateY(-1px); box-shadow:0 6px 20px rgba(0,229,160,.3); }
+.btn:disabled { opacity:.5; cursor:not-allowed; }
+
+/* STATUS */
+.status {
+  display:none; align-items:center; gap:10px;
+  background:rgba(0,229,160,.05); border:1px solid rgba(0,229,160,.15);
+  border-radius:10px; padding:13px 16px; margin-top:14px;
+  font-size:13px; color:var(--accent);
+}
+.status.on { display:flex; }
+.spin {
+  width:15px; height:15px; border:2px solid rgba(0,229,160,.2);
+  border-top-color:var(--accent); border-radius:50%;
+  animation:spin .7s linear infinite; flex-shrink:0;
+}
+.err {
+  background:rgba(255,107,107,.08); border:1px solid rgba(255,107,107,.25);
+  border-radius:10px; padding:14px 18px; color:var(--accent3);
+  font-size:13px; margin-top:14px; display:none;
+}
+.err.on { display:block; }
+
+/* RESULTS */
+.res-header {
+  display:flex; justify-content:space-between; align-items:center;
+  margin-bottom:18px;
+}
+.res-title { font-family:'Syne',sans-serif; font-size:17px; font-weight:700; }
+.res-count {
+  font-size:12px; color:var(--muted); background:var(--surface);
+  border:1px solid var(--border); border-radius:100px; padding:3px 12px;
+}
+.res-hint { color:var(--muted); font-size:13px; margin-bottom:18px; }
+.grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(270px,1fr)); gap:14px; margin-bottom:36px; }
+
+/* CARD */
+.card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:14px; padding:18px; cursor:pointer;
+  transition:transform .2s, border-color .2s, box-shadow .2s;
+  position:relative; overflow:hidden;
+}
+.card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  opacity:0; transition:opacity .2s;
+}
+.card:hover { transform:translateY(-3px); border-color:rgba(0,229,160,.3); box-shadow:0 8px 28px rgba(0,0,0,.3); }
+.card:hover::before, .card.sel::before { opacity:1; }
+.card.sel { border-color:var(--accent); box-shadow:0 0 0 3px rgba(0,229,160,.15); }
+.cname { font-family:'Syne',sans-serif; font-size:14px; font-weight:700; margin-bottom:6px; line-height:1.3; }
+.cmeta { font-size:11px; color:var(--muted); margin-bottom:10px; line-height:1.5; }
+.prices { display:flex; flex-direction:column; gap:5px; }
+.prow {
+  display:flex; justify-content:space-between; align-items:center;
+  background:var(--surface2); border-radius:7px; padding:6px 9px; font-size:12px;
+}
+.prow.best { background:rgba(0,229,160,.08); border:1px solid rgba(0,229,160,.2); }
+.dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; margin-right:6px; }
+.phname { color:var(--muted); font-size:11px; }
+.pval { font-family:'Syne',sans-serif; font-weight:700; font-size:13px; }
+.bestbadge {
+  font-size:8px; background:var(--accent); color:#0d1117;
+  border-radius:3px; padding:2px 5px; font-weight:700;
+  letter-spacing:.5px; text-transform:uppercase; margin-left:5px;
+}
+.pna { color:var(--muted); font-size:11px; font-style:italic; }
+
+/* COMPARISON */
+#cmp {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:16px; padding:26px; margin-bottom:44px;
+}
+.ctitle { font-family:'Syne',sans-serif; font-size:20px; font-weight:800; margin-bottom:4px; }
+.csub { color:var(--muted); font-size:13px; margin-bottom:22px; }
+.bars { display:flex; flex-direction:column; gap:12px; }
+.brow { display:flex; align-items:center; gap:12px; }
+.blabel { width:110px; font-size:12px; font-weight:500; flex-shrink:0; display:flex; align-items:center; gap:6px; }
+.btrack { flex:1; background:var(--surface2); border-radius:100px; height:30px; overflow:hidden; }
+.bfill {
+  height:100%; border-radius:100px;
+  transition:width 1s cubic-bezier(.16,1,.3,1);
+  display:flex; align-items:center; padding-left:10px;
+  font-family:'Syne',sans-serif; font-weight:700; font-size:12px;
+  color:#0d1117; white-space:nowrap;
+}
+.winner {
+  display:flex; align-items:center; gap:10px; margin-top:18px;
+  background:rgba(0,229,160,.08); border:1px solid rgba(0,229,160,.25);
+  border-radius:12px; padding:14px 16px;
+}
+.wico { font-size:22px; }
+.wtxt { font-family:'Syne',sans-serif; font-size:15px; font-weight:700; }
+.wsub { font-size:12px; color:var(--muted); margin-top:2px; }
+.save {
+  margin-left:auto; background:var(--accent); color:#0d1117;
+  border-radius:8px; padding:6px 12px;
+  font-family:'Syne',sans-serif; font-weight:800; font-size:13px;
+}
+
+footer {
+  text-align:center; padding:28px 0;
+  color:var(--muted); font-size:11px;
+  border-top:1px solid var(--border);
+}
+
+@keyframes fdw { from{opacity:0;transform:translateY(-14px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fup { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+@keyframes spin { to{transform:rotate(360deg)} }
+
+@media(max-width:560px){
+  .srow{flex-direction:column;}
+  .blabel{width:85px;font-size:10px;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="badge">💊 Comparador de Precios</div>
+  <h1>FarmaCompar</h1>
+  <p class="sub">Compará precios en las principales farmacias de Paraguay</p>
+  <div class="tags">
+    <span class="tag t1">● puntofarma.com.py</span>
+    <span class="tag t2">● farmacenter.com.py</span>
+    <span class="tag t3">● farmaoliva.com.py</span>
+  </div>
+</header>
+
+<div class="search-sec">
+  <div class="search-box">
+    <span class="slabel">¿Qué medicamento buscás?</span>
+    <div class="srow">
+      <input type="text" id="inp" placeholder="Ej: Ibuprofeno 400mg, Paracetamol, Omeprazol...">
+      <button class="btn" id="sbtn" onclick="doSearch()">Buscar →</button>
+    </div>
+  </div>
+  <div class="status" id="st"><div class="spin"></div><span id="stxt">Consultando...</span></div>
+  <div class="err" id="err"></div>
+</div>
+
+<div id="res" style="display:none"></div>
+<div id="cmp" style="display:none"></div>
+
+</div>
+<footer>Los precios son orientativos. Verificá disponibilidad en cada farmacia.</footer>
+
+<script>
+const C={puntofarma:'#00e5a0',farmacenter:'#00b8ff',farmaoliva:'#ffd166'};
+const L={puntofarma:'PuntoFarma',farmacenter:'FarmaCenter',farmaoliva:'FarmaOliva'};
+const PH=['puntofarma','farmacenter','farmaoliva'];
+let prods=[], sel=null;
+
+async function doSearch(){
+  const q=document.getElementById('inp').value.trim();
+  if(!q) return;
+  const btn=document.getElementById('sbtn');
+  const st=document.getElementById('st');
+  const err=document.getElementById('err');
+  const res=document.getElementById('res');
+  const cmp=document.getElementById('cmp');
+  btn.disabled=true;
+  st.classList.add('on');
+  err.classList.remove('on');
+  res.style.display='none';
+  cmp.style.display='none';
+  sel=null;
+  document.getElementById('stxt').textContent=`Buscando "${q}" en las 3 farmacias...`;
+  try {
+    const prompt=`Busca el producto "${q}" en estas tres farmacias paraguayas: puntofarma.com.py, farmacenter.com.py y farmaoliva.com.py. Usa búsqueda web para encontrar productos y precios actuales en guaraníes.
+
+Devuelve SOLO este JSON sin backticks ni texto adicional:
+{"products":[{"id":"1","name":"nombre completo","description":"concentracion, presentacion, laboratorio","prices":{"puntofarma":45000,"farmacenter":47500,"farmaoliva":null}}]}
+
+Reglas: productos unicos sin duplicados, precios como numeros enteros en guaranies, null si no disponible, maximo 9 productos, mas relevantes primero.`;
+
+    const resp=await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        model:"claude-sonnet-4-20250514",
+        max_tokens:1000,
+        system:"Eres asistente de comparacion de precios de farmacias paraguayas. Responde UNICAMENTE con JSON valido, sin backticks ni texto extra.",
+        tools:[{"type":"web_search_20250305","name":"web_search"}],
+        messages:[{role:"user",content:prompt}]
+      })
+    });
+    const data=await resp.json();
+    if(data.error) throw new Error(data.error.message);
+    const txt=data.content.filter(b=>b.type==="text").map(b=>b.text).join("\n");
+    let parsed;
+    try {
+      const clean=txt.replace(/```json|```/g,'').trim();
+      const s=clean.indexOf('{'), e=clean.lastIndexOf('}');
+      parsed=JSON.parse(clean.substring(s,e+1));
+    } catch { throw new Error("No se pudieron procesar los resultados. Intentá con otro término."); }
+    if(!parsed.products||parsed.products.length===0) throw new Error(`No se encontraron productos para "${q}".`);
+    prods=parsed.products;
+    renderProds(q);
+  } catch(e) {
+    err.textContent="⚠ "+e.message;
+    err.classList.add('on');
+  } finally {
+    btn.disabled=false;
+    st.classList.remove('on');
+  }
+}
+
+function renderProds(q){
+  const div=document.getElementById('res');
+  div.innerHTML=`
+    <div class="res-header">
+      <span class="res-title">Resultados para "${q}"</span>
+      <span class="res-count">${prods.length} producto${prods.length!==1?'s':''}</span>
+    </div>
+    <p class="res-hint">Tocá un producto para ver la comparación de precios 👇</p>
+    <div class="grid">${prods.map((p,i)=>card(p,i)).join('')}</div>`;
+  div.style.display='block';
+}
+
+function card(p,i){
+  const vals=PH.map(ph=>p.prices[ph]).filter(v=>v!==null&&v>0);
+  const min=vals.length?Math.min(...vals):null;
+  const rows=PH.map(ph=>{
+    const pr=p.prices[ph];
+    const best=pr!==null&&pr===min;
+    return `<div class="prow${best?' best':''}">
+      <div style="display:flex;align-items:center">
+        <div class="dot" style="background:${C[ph]}"></div>
+        <span class="phname">${L[ph]}</span>
+        ${best?'<span class="bestbadge">Mejor</span>':''}
+      </div>
+      ${pr?`<span class="pval" style="${best?'color:var(--c1)':''}"">Gs. ${pr.toLocaleString('es-PY')}</span>`:'<span class="pna">No disponible</span>'}
+    </div>`;
+  }).join('');
+  return `<div class="card" id="c${i}" onclick="pick(${i})">
+    <div class="cname">${p.name}</div>
+    <div class="cmeta">${p.description||''}</div>
+    <div class="prices">${rows}</div>
+  </div>`;
+}
+
+function pick(i){
+  document.querySelectorAll('.card').forEach(c=>c.classList.remove('sel'));
+  document.getElementById('c'+i).classList.add('sel');
+  sel=prods[i];
+  showCmp(sel);
+}
+
+function showCmp(p){
+  const panel=document.getElementById('cmp');
+  const items=PH.map(ph=>({ph,price:p.prices[ph]})).filter(x=>x.price!==null&&x.price>0).sort((a,b)=>a.price-b.price);
+  if(!items.length){panel.innerHTML='<p style="color:var(--muted)">Sin precios disponibles.</p>';panel.style.display='block';return;}
+  const win=items[0];
+  const maxP=Math.max(...items.map(x=>x.price));
+  const sav=maxP-win.price;
+  const savP=((sav/maxP)*100).toFixed(0);
+  const bars=items.map(x=>{
+    const pct=Math.round((x.price/maxP)*100);
+    return `<div class="brow">
+      <div class="blabel"><div class="dot" style="background:${C[x.ph]}"></div>${L[x.ph]}</div>
+      <div class="btrack"><div class="bfill" style="width:0%;background:${C[x.ph]}" data-w="${pct}">Gs. ${x.price.toLocaleString('es-PY')}</div></div>
+    </div>`;
+  }).join('');
+  panel.innerHTML=`
+    <div class="ctitle">Comparación de precios</div>
+    <div class="csub">${p.name}</div>
+    <div class="bars">${bars}</div>
+    <div class="winner">
+      <span class="wico">🏆</span>
+      <div>
+        <div class="wtxt">Mejor precio: ${L[win.ph]}</div>
+        <div class="wsub">Gs. ${win.price.toLocaleString('es-PY')} — el más económico</div>
+      </div>
+      ${sav>0?`<div class="save">Ahorrás Gs. ${sav.toLocaleString('es-PY')} (${savP}%)</div>`:''}
+    </div>`;
+  panel.style.display='block';
+  setTimeout(()=>{panel.querySelectorAll('.bfill').forEach(el=>{el.style.width=el.dataset.w+'%';});},80);
+  panel.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+document.getElementById('inp').addEventListener('keydown',e=>{if(e.key==='Enter')doSearch();});
+</script>
+</body>
+</html>
